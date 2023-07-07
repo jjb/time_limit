@@ -19,17 +19,17 @@ class TestTimeout < Test::Unit::TestCase
     end
   end
 
-  # def test_included
-  #   c = Class.new do
-  #     include Timeout
-  #     def test
-  #       timeout(1) { :ok }
-  #     end
-  #   end
-  #   assert_nothing_raised do
-  #     assert_equal :ok, c.new.test
-  #   end
-  # end
+  def test_included
+    c = Class.new do
+      include Timeout
+      def test
+        timeout(1) { :ok }
+      end
+    end
+    assert_nothing_raised do
+      assert_equal :ok, c.new.test
+    end
+  end
 
   # def test_yield_param
   #   assert_equal [5, :ok], Timeout.timeout(5){|s| [s, :ok] }
