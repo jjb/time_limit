@@ -40,13 +40,13 @@ class TestTimeout < Test::Unit::TestCase
 
   def test_queue
     q = Thread::Queue.new
-    assert_raise(TimedOut, "[ruby-dev:32935]") {
+    assert_raise(Timeout::TimedOut, "[ruby-dev:32935]") {
       Timeout.timeout(0.01) { q.pop }
     }
   end
 
   def test_timeout
-    assert_raise(TimedOut) do
+    assert_raise(Timeout::TimedOut) do
       Timeout.timeout(0.1) {
         nil while true
       }
@@ -55,7 +55,7 @@ class TestTimeout < Test::Unit::TestCase
 
   def test_nested_timeout
     a = nil
-    assert_raise(TimedOut) do
+    assert_raise(Timeout::TimedOut) do
       Timeout.timeout(0.1) {
         Timeout.timeout(1) {
           nil while true
@@ -74,7 +74,7 @@ class TestTimeout < Test::Unit::TestCase
 
   def test_skip_rescue_standarderror
     e = nil
-    assert_raise_with_message(TimedOut, /execution expired/) do
+    assert_raise_with_message(Timeout::TimedOut, /execution expired/) do
       Timeout.timeout 0.01 do
         begin
           sleep 3
@@ -87,7 +87,7 @@ class TestTimeout < Test::Unit::TestCase
 
   def test_raises_exception_internally
     e = nil
-    assert_raise_with_message(TimedOut, /execution expired/) do
+    assert_raise_with_message(Timeout::TimedOut, /execution expired/) do
       Timeout.timeout 0.01 do
         begin
           sleep 3
@@ -97,7 +97,7 @@ class TestTimeout < Test::Unit::TestCase
         end
       end
     end
-    assert_equal InterruptException, e.class
+    assert_equal Timeout::InterruptException, e.class
   end
 
   # not supporting custom error to raise, for now
@@ -137,17 +137,17 @@ class TestTimeout < Test::Unit::TestCase
 
   # not supporting custom error message, for now
   # def test_exit_exception
-  #   assert_raise_with_message(TimedOut, "boon") do
-  #     Timeout.timeout(10, TimedOut) do
-  #       raise TimedOut, "boon"
+  #   assert_raise_with_message(Timeout::TimedOut, "boon") do
+  #     Timeout.timeout(10, Timeout::TimedOut) do
+  #       raise Timeout::TimedOut, "boon"
   #     end
   #   end
   # end
 
   # def test_raise_with_message
-  #   bug17812 = '[ruby-core:103502] [Bug #17812]: TimedOut doesn\'t let two-argument raise() set a new message'
-  #   exc = TimedOut.new('foo')
-  #   assert_raise_with_message(TimedOut, 'bar', bug17812) do
+  #   bug17812 = '[ruby-core:103502] [Bug #17812]: Timeout::TimedOut doesn\'t let two-argument raise() set a new message'
+  #   exc = Timeout::TimedOut.new('foo')
+  #   assert_raise_with_message(Timeout::TimedOut, 'bar', bug17812) do
   #     raise exc, 'bar'
   #   end
   # end
@@ -158,7 +158,7 @@ class TestTimeout < Test::Unit::TestCase
     def o.each
       sleep
     end
-    assert_raise_with_message(TimedOut, 'execution expired', bug9380) do
+    assert_raise_with_message(Timeout::TimedOut, 'execution expired', bug9380) do
       Timeout.timeout(0.01) {e.next}
     end
   end
@@ -166,12 +166,12 @@ class TestTimeout < Test::Unit::TestCase
   def test_handle_interrupt
     bug11344 = '[ruby-dev:49179] [Bug #11344]'
     ok = false
-    assert_raise(TimedOut) {
-      Thread.handle_interrupt(InterruptException => :never) {
+    assert_raise(Timeout::TimedOut) {
+      Thread.handle_interrupt(Timeout::InterruptException => :never) {
         Timeout.timeout(0.01) {
           sleep 0.2
           ok = true
-          Thread.handle_interrupt(InterruptException => :on_blocking) {
+          Thread.handle_interrupt(Timeout::InterruptException => :on_blocking) {
             sleep 0.2
           }
         }
@@ -191,7 +191,7 @@ class TestTimeout < Test::Unit::TestCase
   #     begin
   #       r = Timeout.timeout(0.01) { sleep 5; }
   #       w.write r.inspect
-  #     rescue TimedOut
+  #     rescue Timeout::TimedOut
   #       w.write 'timeout'
   #     ensure
   #       w.close
