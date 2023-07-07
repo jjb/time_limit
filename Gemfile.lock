@@ -1,0 +1,22 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    pairing_heap (3.0.1)
+    power_assert (2.0.3)
+    rake (13.0.6)
+    test-unit (3.6.1)
+      power_assert
+    test-unit-ruby-core (1.0.1)
+
+PLATFORMS
+  arm64-darwin-21
+
+DEPENDENCIES
+  bundler
+  pairing_heap
+  rake
+  test-unit
+  test-unit-ruby-core
+
+BUNDLED WITH
+   2.4.10

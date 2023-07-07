@@ -10,25 +10,6 @@ JOBS_MUTEX.synchronize do
   JOBS = PairingHeap::MinPriorityQueue.new
 end
 
-Thread.new do
-  loop do
-    sleep 0.001
-
-    # todo: loop through until no more relevant jobs
-    j = nil
-    JOBS_MUTEX.synchronize do
-      next unless JOBS.any?
-      soonest = JOBS.peek_priority
-      if soonest < Time.now
-        j = JOBS.pop
-      end
-    end
-    next unless j
-
-    j.interrupt
-  end
-end
-
 class Job
   def initialize(seconds, proc, thread)
     @seconds = seconds
@@ -78,6 +59,7 @@ end
 
 module Timeout
   def self.timeout(seconds)
+    create_watcher_thread
     p = Proc.new do
       yield
     end
@@ -89,6 +71,30 @@ module Timeout
 
     j.run
   end
+
+
+  def self.create_watcher_thread
+    $watcher ||= Thread.new do
+      puts ">>>>>>>>NEWTHREAD"
+      loop do
+        sleep 0.001
+
+        # todo: loop through until no more relevant jobs
+        j = nil
+        JOBS_MUTEX.synchronize do
+          next unless JOBS.any?
+          soonest = JOBS.peek_priority
+          if soonest < Time.now
+            j = JOBS.pop
+          end
+        end
+        next unless j
+
+        j.interrupt
+      end
+    end
+  end
+
 end
 
 

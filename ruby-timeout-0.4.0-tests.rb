@@ -1,5 +1,8 @@
 # frozen_string_literal: false
 require 'test/unit'
+require "core_assertions"
+Test::Unit::TestCase.include Test::Unit::CoreAssertions
+
 require_relative 'code.rb'
 
 class TestTimeout < Test::Unit::TestCase
@@ -177,13 +180,16 @@ class TestTimeout < Test::Unit::TestCase
     assert(ok, bug11344)
   end
 
+
+  # i think new watcher thread needs to be created
+  # maybe cloned one needs to be cleaned up. look at ruby timeout
   # def test_fork
   #   omit 'fork not supported' unless Process.respond_to?(:fork)
   #   r, w = IO.pipe
   #   pid = fork do
   #     r.close
   #     begin
-  #       r = Timeout.timeout(0.01) { sleep 5 }
+  #       r = Timeout.timeout(0.01) { sleep 5; }
   #       w.write r.inspect
   #     rescue TimedOut
   #       w.write 'timeout'
@@ -197,29 +203,29 @@ class TestTimeout < Test::Unit::TestCase
   #   r.close
   # end
 
-  # def test_threadgroup
-  #   assert_separately(%w[-rtimeout], <<-'end;')
-  #     tg = ThreadGroup.new
-  #     thr = Thread.new do
-  #       tg.add(Thread.current)
-  #       Timeout.timeout(10){}
-  #     end
-  #     thr.join
-  #     assert_equal [].to_s, tg.list.to_s
-  #   end;
-  # end
+  def test_threadgroup
+    assert_separately(%w[-rtimeout], <<-'end;')
+      tg = ThreadGroup.new
+      thr = Thread.new do
+        tg.add(Thread.current)
+        Timeout.timeout(10){}
+      end
+      thr.join
+      assert_equal [].to_s, tg.list.to_s
+    end;
+  end
 
-  # # https://github.com/ruby/timeout/issues/24
-  # def test_handling_enclosed_threadgroup
-  #   assert_separately(%w[-rtimeout], <<-'end;')
-  #     Thread.new {
-  #       t = Thread.current
-  #       group = ThreadGroup.new
-  #       group.add(t)
-  #       group.enclose
+  # https://github.com/ruby/timeout/issues/24
+  def test_handling_enclosed_threadgroup
+    assert_separately(%w[-rtimeout], <<-'end;')
+      Thread.new {
+        t = Thread.current
+        group = ThreadGroup.new
+        group.add(t)
+        group.enclose
 
-  #       assert_equal 42, Timeout.timeout(1) { 42 }
-  #     }.join
-  #   end;
-  # end
+        assert_equal 42, Timeout.timeout(1) { 42 }
+      }.join
+    end;
+  end
 end
