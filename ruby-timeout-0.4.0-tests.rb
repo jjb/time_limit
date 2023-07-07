@@ -97,6 +97,7 @@ class TestTimeout < Test::Unit::TestCase
     assert_equal InterruptException, e.class
   end
 
+  # not supporting custom error to raise, for now
   # def test_rescue_exit
   #   exc = Class.new(RuntimeError)
   #   e = nil
@@ -131,6 +132,7 @@ class TestTimeout < Test::Unit::TestCase
   #   end
   # end
 
+  # not supporting custom error message, for now
   # def test_exit_exception
   #   assert_raise_with_message(TimedOut, "boon") do
   #     Timeout.timeout(10, TimedOut) do
@@ -147,16 +149,16 @@ class TestTimeout < Test::Unit::TestCase
   #   end
   # end
 
-  # def test_enumerator_next
-  #   bug9380 = '[ruby-dev:47872] [Bug #9380]: timeout in Enumerator#next'
-  #   e = (o=Object.new).to_enum
-  #   def o.each
-  #     sleep
-  #   end
-  #   assert_raise_with_message(TimedOut, 'execution expired', bug9380) do
-  #     Timeout.timeout(0.01) {e.next}
-  #   end
-  # end
+  def test_enumerator_next
+    bug9380 = '[ruby-dev:47872] [Bug #9380]: timeout in Enumerator#next'
+    e = (o=Object.new).to_enum
+    def o.each
+      sleep
+    end
+    assert_raise_with_message(TimedOut, 'execution expired', bug9380) do
+      Timeout.timeout(0.01) {e.next}
+    end
+  end
 
   # def test_handle_interrupt
   #   bug11344 = '[ruby-dev:49179] [Bug #11344]'
