@@ -1,3 +1,6 @@
+
+# https://github.com/jjb/timeout/tree/lifecycle-tests/test
+
 class MyStandardError < StandardError; end
 class MyException< Exception; end
 
