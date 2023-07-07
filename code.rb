@@ -41,7 +41,6 @@ class Job
   end
 
   def interrupt
-    puts "interrupting #{@thread.name}"
     @mutex.synchronize do
       return if @done
       @timeout_expected = true
@@ -66,7 +65,6 @@ module Timeout
 
   def self.create_watcher_thread
     $watcher ||= Thread.new do
-      puts ">>>>>>>>NEWTHREAD"
       loop do
         sleep 0.001
 
