@@ -43,7 +43,7 @@ class Job
     r = @proc.call
   rescue InterruptException
     puts 2
-    raise TimedOut
+    raise TimedOut.new('execution expired')
   rescue Exception
     puts 3
 

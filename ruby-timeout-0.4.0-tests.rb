@@ -69,18 +69,18 @@ class TestTimeout < Test::Unit::TestCase
     assert_raise(TypeError, bug3168) {Timeout.timeout(n) { sleep 0.1 }}
   end
 
-  # def test_skip_rescue_standarderror
-  #   e = nil
-  #   assert_raise_with_message(TimedOut, /execution expired/) do
-  #     Timeout.timeout 0.01 do
-  #       begin
-  #         sleep 3
-  #       rescue => e
-  #         flunk "should not see any exception but saw #{e.inspect}"
-  #       end
-  #     end
-  #   end
-  # end
+  def test_skip_rescue_standarderror
+    e = nil
+    assert_raise_with_message(TimedOut, /execution expired/) do
+      Timeout.timeout 0.01 do
+        begin
+          sleep 3
+        rescue => e
+          flunk "should not see any exception but saw #{e.inspect}"
+        end
+      end
+    end
+  end
 
   # def test_raises_exception_internally
   #   e = nil
