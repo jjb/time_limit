@@ -82,20 +82,20 @@ class TestTimeout < Test::Unit::TestCase
     end
   end
 
-  # def test_raises_exception_internally
-  #   e = nil
-  #   assert_raise_with_message(TimedOut, /execution expired/) do
-  #     Timeout.timeout 0.01 do
-  #       begin
-  #         sleep 3
-  #       rescue Exception => exc
-  #         e = exc
-  #         raise
-  #       end
-  #     end
-  #   end
-  #   assert_equal Timeout::ExitException, e.class
-  # end
+  def test_raises_exception_internally
+    e = nil
+    assert_raise_with_message(TimedOut, /execution expired/) do
+      Timeout.timeout 0.01 do
+        begin
+          sleep 3
+        rescue Exception => exc
+          e = exc
+          raise
+        end
+      end
+    end
+    assert_equal InterruptException, e.class
+  end
 
   # def test_rescue_exit
   #   exc = Class.new(RuntimeError)
