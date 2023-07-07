@@ -19,7 +19,6 @@ class ErrorLifeCycleTester
     @outer_else = false
     @outer_ensure = false
     @outer_ensure_has_time_to_finish = false
-    # require 'irb'; binding.irb
 
     begin
       Timeout.timeout(0.001) do

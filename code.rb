@@ -20,18 +20,12 @@ class Job
   end
 
   def run
-    puts 1
     r = @proc.call
   rescue InterruptException
-    puts 2
     raise TimedOut.new('execution expired')
   rescue Exception
-    puts 3
-
     raise
   else
-    puts 4
-        # require 'irb'; binding.irb
     if @timeout_expected
       @mutex.synchronize do
         @done = true # ensure will not be reached if raising in an else
@@ -41,7 +35,6 @@ class Job
       r
     end
   ensure
-    puts 5
     @mutex.synchronize do
       @done = true
     end
@@ -67,11 +60,9 @@ module Timeout
     JOBS_MUTEX.synchronize do
       JOBS.push(j, Time.now + seconds)
     end
-        # require 'irb'; binding.irb
 
     j.run
   end
-
 
   def self.create_watcher_thread
     $watcher ||= Thread.new do
@@ -96,7 +87,6 @@ module Timeout
   end
 
 end
-
 
 # idea: give an inner ensure the ability to tell the class it's in an ensure
 # FunTimeout::EnsureProtector.mutext do
