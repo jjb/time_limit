@@ -90,3 +90,5 @@ end
 # FunTimeout::EnsureProtector.mutext do
 #   ...
 # end
+#
+# https://ruby-doc.org/core-2.5.0/Thread.html#method-c-handle_interrupt
