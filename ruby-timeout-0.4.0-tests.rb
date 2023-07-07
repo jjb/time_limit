@@ -160,22 +160,22 @@ class TestTimeout < Test::Unit::TestCase
     end
   end
 
-  # def test_handle_interrupt
-  #   bug11344 = '[ruby-dev:49179] [Bug #11344]'
-  #   ok = false
-  #   assert_raise(TimedOut) {
-  #     Thread.handle_interrupt(Timeout::ExitException => :never) {
-  #       Timeout.timeout(0.01) {
-  #         sleep 0.2
-  #         ok = true
-  #         Thread.handle_interrupt(Timeout::ExitException => :on_blocking) {
-  #           sleep 0.2
-  #         }
-  #       }
-  #     }
-  #   }
-  #   assert(ok, bug11344)
-  # end
+  def test_handle_interrupt
+    bug11344 = '[ruby-dev:49179] [Bug #11344]'
+    ok = false
+    assert_raise(TimedOut) {
+      Thread.handle_interrupt(InterruptException => :never) {
+        Timeout.timeout(0.01) {
+          sleep 0.2
+          ok = true
+          Thread.handle_interrupt(InterruptException => :on_blocking) {
+            sleep 0.2
+          }
+        }
+      }
+    }
+    assert(ok, bug11344)
+  end
 
   # def test_fork
   #   omit 'fork not supported' unless Process.respond_to?(:fork)
