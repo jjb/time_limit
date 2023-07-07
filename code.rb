@@ -4,23 +4,23 @@ class InterruptException < Exception; end
 class TimedOut < StandardError; end
 class TimedOutAndRescued < TimedOut; end
 
-@jobs_mutex = Mutex.new
+JOBS_MUTEX = Mutex.new
 
-@jobs_mutex.synchronize do
-  @jobs = PairingHeap::MinPriorityQueue.new
+JOBS_MUTEX.synchronize do
+  JOBS = PairingHeap::MinPriorityQueue.new
 end
 
 Thread.new do
   loop do
-    sleep 1
+    sleep 0.001
 
     # todo: loop through until no more relevant jobs
     j = nil
-    @jobs_mutex.synchronize do
-      next unless @jobs.any?
-      soonest = @jobs.peek_priority
+    JOBS_MUTEX.synchronize do
+      next unless JOBS.any?
+      soonest = JOBS.peek_priority
       if soonest < Time.now
-        j = @jobs.pop
+        j = JOBS.pop
       end
     end
     next unless j
@@ -39,19 +39,28 @@ class Job
   end
 
   def run
-    @proc.call
+    puts 1
+    r = @proc.call
   rescue InterruptException
+    puts 2
     raise TimedOut
   rescue Exception
+    puts 3
+
     raise
   else
+    puts 4
+        # require 'irb'; binding.irb
     if @timeout_expected
       @mutex.synchronize do
         @done = true # ensure will not be reached if raising in an else
       end
       raise TimedOutAndRescued
+    else
+      r
     end
   ensure
+    puts 5
     @mutex.synchronize do
       @done = true
     end
@@ -67,15 +76,19 @@ class Job
   end
 end
 
-def w(seconds)
-  p = Proc.new do
-    yield
+module Timeout
+  def self.timeout(seconds)
+    p = Proc.new do
+      yield
+    end
+    j = Job.new(seconds, p, Thread.current)
+    JOBS_MUTEX.synchronize do
+      JOBS.push(j, Time.now + seconds)
+    end
+        # require 'irb'; binding.irb
+
+    j.run
   end
-  j = Job.new(seconds, p, Thread.current)
-  @jobs_mutex.synchronize do
-    @jobs.push(j, Time.now + seconds)
-  end
-  j.run
 end
 
 

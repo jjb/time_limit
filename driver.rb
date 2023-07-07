@@ -3,7 +3,7 @@ require_relative 'code.rb'
 t1 = Thread.new do
   Thread.current.name = 't1'
 begin
-  w(4) do
+  Timeout.timeout(4) do
     begin
       sleep 6
     rescue Exception
@@ -21,7 +21,7 @@ end
 t2 = Thread.new do
     Thread.current.name = 't2'
 begin
-  w(1) do
+  Timeout.timeout(1) do
     begin
       sleep 2
     rescue 
@@ -38,7 +38,7 @@ end
 
 puts
 puts "starting..."
-w(1) do
+Timeout.timeout(1) do
     Thread.current.name = 'fast'
   puts "running..."
 end
