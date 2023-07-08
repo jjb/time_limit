@@ -1,15 +1,16 @@
 require 'benchmark/ips'
 
 require_relative 'time_limit.rb'
+require 'timeout'
+
 Benchmark.ips do |x|
-  x.report("weird_timeout") do
-    Timeout.timeout(1) {}
+  x.report("T") do
+    value = Timeout.timeout(1) {:ok}
   end
 end
 
-require 'timeout'
 Benchmark.ips do |x|
-  x.report("timeout") do
-    Timeout.timeout(1) {}
+  x.report("TimeLimit") do
+    value = Timeout.timeout(1) {:ok}
   end
 end
