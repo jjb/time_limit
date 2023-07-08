@@ -136,13 +136,13 @@ class TestTimeLimit < Test::Unit::TestCase
   end
 
   # not supporting custom error message, for now
-  # def test_exit_exception
-  #   assert_raise_with_message(TimeLimit::TimedOut, "boon") do
-  #     TimeLimit.timeout(10, TimeLimit::TimedOut) do
-  #       raise TimeLimit::TimedOut, "boon"
-  #     end
-  #   end
-  # end
+  def test_exit_exception
+    assert_raise_with_message(TimeLimit::TimedOut, "boon") do
+      TimeLimit.timeout(10, TimeLimit::TimedOut) do
+        raise TimeLimit::TimedOut, "boon"
+      end
+    end
+  end
 
   # def test_raise_with_message
   #   bug17812 = '[ruby-core:103502] [Bug #17812]: TimeLimit::TimedOut doesn\'t let two-argument raise() set a new message'
