@@ -22,17 +22,17 @@ class TestTimeout < Test::Unit::TestCase
     end
   end
 
-  # def test_included
-  #   c = Class.new do
-  #     include Timeout
-  #     def test
-  #       timeout(1) { :ok }
-  #     end
-  #   end
-  #   assert_nothing_raised do
-  #     assert_equal :ok, c.new.test
-  #   end
-  # end
+  def test_included
+    c = Class.new do
+      include Timeout
+      def test
+        timeout(1) { :ok }
+      end
+    end
+    assert_nothing_raised do
+      assert_equal :ok, c.new.test
+    end
+  end
 
   # def test_yield_param
   #   assert_equal [5, :ok], Timeout.timeout(5){|s| [s, :ok] }
@@ -180,9 +180,6 @@ class TestTimeout < Test::Unit::TestCase
     assert(ok, bug11344)
   end
 
-
-  # i think new watcher thread needs to be created
-  # maybe cloned one needs to be cleaned up. look at ruby timeout
   def test_fork
     omit 'fork not supported' unless Process.respond_to?(:fork)
     r, w = IO.pipe
