@@ -3,6 +3,9 @@ ruby Timeout.
 
 TimeLimit is API-compatible with Timeout.
 
+In a simple benchmark, TimeLimit has similar time complexity to Timeout.
+I haven't tried measuring space complexity.
+
 TimeLimit shares most behaviors with Timeout, with the following exceptions:
 
 ## Always raises an exception when timing out
@@ -13,9 +16,9 @@ code rescues Exception.
 ## Never raises the custom exception inside the timed code
 
 If providing a custom exception, Timeout will (sometimes?) raise
-that exception inside the thread, instead of ExitException. I'm
-not sure if this is considered a feature, or a historical necessity.
-I can't think of a scneario where it's useful. The code being timeboxed
+that exception inside the timed code, instead of ExitException. I'm
+not sure if this is considered a feature, or a historical necesity.
+I can't think of a scenario where it's useful. The timed code
 needs to know to expect this exception. If it has that level of knowledge,
 why not just not provide a custom exception and rescue ExitException instead?
 I'm still exploring this one.
