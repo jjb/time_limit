@@ -1,10 +1,4 @@
-
-# https://github.com/jjb/timeout/tree/lifecycle-tests/test
-
 require 'test/unit'
-require "core_assertions"
-Test::Unit::TestCase.include Test::Unit::CoreAssertions
-
 require_relative 'time_limit.rb'
 
 class TestErrorLifecycle < Test::Unit::TestCase
@@ -18,7 +12,6 @@ class TestErrorLifecycle < Test::Unit::TestCase
     assert !s.inner_else
     assert s.inner_ensure
     assert s.outer_ensure
-    assert s.outer_rescue
 
     # This can result in user's expectation of total possible time
     # being very wrong
@@ -28,22 +21,66 @@ class TestErrorLifecycle < Test::Unit::TestCase
     assert s.outer_ensure_has_time_to_finish
   end
 
-  # when the inner code does not catch Exception
+  # when an exception to raise is not specified and the inner code does not catch Exception
   def test_1
     s = ErrorLifeCycleTester.new
-    s.subject(StandardError)
+    s.subject(nil, StandardError)
     core_assertions(s)
 
     assert !s.inner_rescue
+    assert s.outer_rescue
   end
 
-  # when the inner code does catch Exception
+  # when an exception to raise is not specified and the inner code does catch Exception
   def test_2
     s = ErrorLifeCycleTester.new
-    s.subject(Exception)
+    s.subject(nil, Exception)
+    core_assertions(s)
+
+    assert s.inner_rescue # true in ruby 1.9 stdlib, false in timeout gem 0.2.0, true in timeout gem 0.4.0
+    assert s.outer_rescue # false in ruby 1.9 stdlib, true in timeout gem 0.2.0, false in timeout gem 0.4.0, true in time_limit
+  end
+
+  # when an exception to raise is StandardError and the inner code does not catch Exception
+  def test_3
+    s = ErrorLifeCycleTester.new
+    s.subject(MyStandardError, StandardError)
+    core_assertions(s)
+
+    assert !s.inner_rescue # true in timeout gem 0.4.0, false in time_limit - question: is it a desired feauture of timeout gem that the custom provided exception is seen by the inner code?
+    assert s.outer_rescue # false in timeout gem 0.4.0, true in time_limit
+  end
+
+  # when an exception to raise is StandardError and the inner code does catch Exception
+  def test_4
+    s = ErrorLifeCycleTester.new
+    s.subject(MyStandardError, Exception)
     core_assertions(s)
 
     assert s.inner_rescue
+
+    assert s.outer_rescue # false in timeout gem 0.4.0, true in time_limit
+  end
+
+  # when an exception to raise is Exception and the inner code does not catch Exception
+  def test_5
+    s = ErrorLifeCycleTester.new
+    s.subject(MyException, StandardError)
+    core_assertions(s)
+
+    assert !s.inner_rescue
+    assert s.outer_rescue
+  end
+
+  # when an exception to raise is Exception and the inner code does catch Exception
+  def test_6
+    s = ErrorLifeCycleTester.new
+    s.subject(MyException, Exception)
+    core_assertions(s)
+  
+    assert s.inner_rescue
+
+    assert s.outer_rescue # false in timeout gem 0.4.0, true in time_limit
   end
 
 end

@@ -1,6 +1,3 @@
-
-# https://github.com/jjb/timeout/tree/lifecycle-tests/test
-
 class MyStandardError < StandardError; end
 class MyException< Exception; end
 
@@ -8,7 +5,7 @@ class ErrorLifeCycleTester
   attr_reader :inner_attempted, :inner_else, :inner_rescue, :inner_ensure, :inner_ensure_has_time_to_finish,
               :outer_rescue, :outer_else, :outer_ensure, :outer_ensure_has_time_to_finish
 
-  def subject(error_to_rescue)
+  def subject(error_to_raise, error_to_rescue)
     @inner_attempted = false
     @inner_else = false
     @inner_rescue = false
@@ -21,7 +18,7 @@ class ErrorLifeCycleTester
     @outer_ensure_has_time_to_finish = false
 
     begin
-      TimeLimit.timeout(0.001) do
+      TimeLimit.timeout(0.001, error_to_raise) do
         @inner_attempted = true
         nil while true
       rescue error_to_rescue
