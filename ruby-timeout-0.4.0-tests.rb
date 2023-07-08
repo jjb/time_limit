@@ -183,25 +183,25 @@ class TestTimeout < Test::Unit::TestCase
 
   # i think new watcher thread needs to be created
   # maybe cloned one needs to be cleaned up. look at ruby timeout
-  # def test_fork
-  #   omit 'fork not supported' unless Process.respond_to?(:fork)
-  #   r, w = IO.pipe
-  #   pid = fork do
-  #     r.close
-  #     begin
-  #       r = Timeout.timeout(0.01) { sleep 5; }
-  #       w.write r.inspect
-  #     rescue Timeout::TimedOut
-  #       w.write 'timeout'
-  #     ensure
-  #       w.close
-  #     end
-  #   end
-  #   w.close
-  #   Process.wait pid
-  #   assert_equal 'timeout', r.read
-  #   r.close
-  # end
+  def test_fork
+    omit 'fork not supported' unless Process.respond_to?(:fork)
+    r, w = IO.pipe
+    pid = fork do
+      r.close
+      begin
+        r = Timeout.timeout(0.01) { sleep 5; }
+        w.write r.inspect
+      rescue Timeout::TimedOut
+        w.write 'timeout'
+      ensure
+        w.close
+      end
+    end
+    w.close
+    Process.wait pid
+    assert_equal 'timeout', r.read
+    r.close
+  end
 
   def test_threadgroup
     assert_separately(%w[-rtimeout], <<-'end;')
