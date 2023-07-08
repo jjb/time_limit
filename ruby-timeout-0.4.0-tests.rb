@@ -100,20 +100,30 @@ class TestTimeLimit < Test::Unit::TestCase
     assert_equal TimeLimit::InterruptException, e.class
   end
 
-  # this is different from ruby timeout
-  # def test_rescue_exit
-  #   exc = Class.new(RuntimeError)
-  #   e = nil
-  #   assert_nothing_raised(exc) do
-  #     TimeLimit.timeout 0.01, exc do
-  #       begin
-  #         sleep 3
-  #       rescue exc => e
-  #       end
-  #     end
-  #   end
-  #   assert_raise_with_message(exc, 'execution expired') {raise e if e}
-  # end
+  # DIFFERENT BEHAVIOR FROM timeout gem 0.4.0
+  def test_rescue_exit
+    exc = Class.new(RuntimeError)
+    e = nil
+    rescue_body = nil
+    assert_raise(exc) do # inverse of timeout gem 0.4.0
+      TimeLimit.timeout 0.01, exc do
+        begin
+
+          # InterruptException happens here and is not caught by
+          # rescue exc below. I'm actually not sure why this is not the case
+          # in timeout gem 0.4.0
+          sleep 3
+        rescue exc => e
+          rescue_body = true
+        end
+      end
+    end
+    assert_nil e # only in time_limit
+    assert_nil rescue_body # only in time_limit
+
+    # irrelevant to time_limit
+    # assert_raise_with_message(exc, 'execution expired') {raise e if e}
+  end
 
   def test_custom_exception
     bug9354 = '[ruby-core:59511] [Bug #9354]'
