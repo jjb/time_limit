@@ -100,7 +100,7 @@ class TestTimeLimit < Test::Unit::TestCase
     assert_equal TimeLimit::InterruptException, e.class
   end
 
-  # not supporting custom error to raise, for now
+  # this is different from ruby timeout
   # def test_rescue_exit
   #   exc = Class.new(RuntimeError)
   #   e = nil
@@ -115,25 +115,25 @@ class TestTimeLimit < Test::Unit::TestCase
   #   assert_raise_with_message(exc, 'execution expired') {raise e if e}
   # end
 
-  # def test_custom_exception
-  #   bug9354 = '[ruby-core:59511] [Bug #9354]'
-  #   err = Class.new(StandardError) do
-  #     def initialize(msg) super end
-  #   end
-  #   assert_nothing_raised(ArgumentError, bug9354) do
-  #     assert_equal(:ok, TimeLimit.timeout(100, err) {:ok})
-  #   end
-  #   assert_raise_with_message(err, 'execution expired') do
-  #     TimeLimit.timeout 0.01, err do
-  #       sleep 3
-  #     end
-  #   end
-  #   assert_raise_with_message(err, /connection to ruby-lang.org expired/) do
-  #     TimeLimit.timeout 0.01, err, "connection to ruby-lang.org expired" do
-  #       sleep 3
-  #     end
-  #   end
-  # end
+  def test_custom_exception
+    bug9354 = '[ruby-core:59511] [Bug #9354]'
+    err = Class.new(StandardError) do
+      def initialize(msg) super end
+    end
+    assert_nothing_raised(ArgumentError, bug9354) do
+      assert_equal(:ok, TimeLimit.timeout(100, err) {:ok})
+    end
+    assert_raise_with_message(err, 'execution expired') do
+      TimeLimit.timeout 0.01, err do
+        sleep 3
+      end
+    end
+    assert_raise_with_message(err, /connection to ruby-lang.org expired/) do
+      TimeLimit.timeout 0.01, err, "connection to ruby-lang.org expired" do
+        sleep 3
+      end
+    end
+  end
 
   # not supporting custom error message, for now
   # def test_exit_exception

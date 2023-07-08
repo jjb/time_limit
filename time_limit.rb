@@ -8,9 +8,11 @@ module TimeLimit
   class TimedOutAndRescued < TimedOut; end
 
   class Job
-    def initialize(proc, thread)
+    def initialize(proc, thread, exception_class, message)
       @proc = proc
       @thread = thread
+      @exception_class = exception_class || TimedOut
+      @message = message || 'execution expired'
       @done = false
       @mutex = Mutex.new
     end
@@ -18,7 +20,7 @@ module TimeLimit
     def run
       r = @proc.call
     rescue InterruptException
-      raise TimedOut.new('execution expired')
+      raise @exception_class.new(@message)
     rescue Exception
       raise
     else
@@ -45,14 +47,14 @@ module TimeLimit
     end
   end
 
-  def timeout(seconds)
+  def timeout(seconds, exception_class=nil, message=nil)
     # this works but maybe by accident because Float() raises the error
     raise ArgumentError.new('seconds must be greater than zero') if Float(seconds) < 0.0
 
     p = Proc.new do
       yield
     end
-    j = Job.new(p, Thread.current)
+    j = Job.new(p, Thread.current, exception_class, message)
     Concurrent::ScheduledTask.new(seconds){ j.interrupt }.execute
     j.run
   end
