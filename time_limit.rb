@@ -62,7 +62,7 @@ module TimeLimit
 end
 
 # idea: give an inner ensure the ability to tell the class it's in an ensure
-# FunTimeout::EnsureProtector.mutext do
+# TimeLimit::EnsureProtector.mutext do
 #   ...
 # end
 #
