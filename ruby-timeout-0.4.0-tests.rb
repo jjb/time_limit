@@ -144,13 +144,13 @@ class TestTimeLimit < Test::Unit::TestCase
     end
   end
 
-  # def test_raise_with_message
-  #   bug17812 = '[ruby-core:103502] [Bug #17812]: TimeLimit::TimedOut doesn\'t let two-argument raise() set a new message'
-  #   exc = TimeLimit::TimedOut.new('foo')
-  #   assert_raise_with_message(TimeLimit::TimedOut, 'bar', bug17812) do
-  #     raise exc, 'bar'
-  #   end
-  # end
+  def test_raise_with_message
+    bug17812 = '[ruby-core:103502] [Bug #17812]: TimeLimit::TimedOut doesn\'t let two-argument raise() set a new message'
+    exc = TimeLimit::TimedOut.new('foo')
+    assert_raise_with_message(TimeLimit::TimedOut, 'bar', bug17812) do
+      raise exc, 'bar'
+    end
+  end
 
   def test_enumerator_next
     bug9380 = '[ruby-dev:47872] [Bug #9380]: timeout in Enumerator#next'
