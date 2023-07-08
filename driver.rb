@@ -1,4 +1,4 @@
-require_relative 'code.rb'
+require_relative 'time_limit.rb'
 
 t1 = Thread.new do
   Thread.current.name = 't1'

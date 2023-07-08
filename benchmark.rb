@@ -1,6 +1,6 @@
 require 'benchmark/ips'
 
-require_relative 'code.rb'
+require_relative 'time_limit.rb'
 Benchmark.ips do |x|
   x.report("weird_timeout") do
     Timeout.timeout(1) {}

@@ -5,7 +5,7 @@ require 'test/unit'
 require "core_assertions"
 Test::Unit::TestCase.include Test::Unit::CoreAssertions
 
-require_relative 'code.rb'
+require_relative 'time_limit.rb'
 
 class TestErrorLifecycle < Test::Unit::TestCase
 

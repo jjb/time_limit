@@ -2,7 +2,7 @@
 
 require 'concurrent/scheduled_task'
 
-module Timeout
+module TimeLimit
   class InterruptException < Exception; end
   class TimedOut < StandardError; end
   class TimedOutAndRescued < TimedOut; end
@@ -55,7 +55,7 @@ module Timeout
     end
   end
 
-  def self.timeout(seconds)
+  def timeout(seconds)
     # this works but maybe by accident because Float() raises the error
     raise ArgumentError.new('seconds must be greater than zero') if Float(seconds) < 0.0
 
@@ -76,6 +76,7 @@ module Timeout
 
     j.run
   end
+  module_function :timeout
 
   # def self.create_watcher_thread
   #   return if @watcher && @watcher.alive?

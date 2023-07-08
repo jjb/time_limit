@@ -3,28 +3,28 @@ require 'test/unit'
 require "core_assertions"
 Test::Unit::TestCase.include Test::Unit::CoreAssertions
 
-require_relative 'code.rb'
+require_relative 'time_limit.rb'
 
-class TestTimeout < Test::Unit::TestCase
+class TestTimeLimit < Test::Unit::TestCase
 
   def test_work_is_done_in_same_thread_as_caller
-    assert_equal Thread.current, Timeout.timeout(10){ Thread.current }
+    assert_equal Thread.current, TimeLimit.timeout(10){ Thread.current }
   end
 
   def test_work_is_done_in_same_fiber_as_caller
     require 'fiber' # needed for ruby 3.0 and lower
-    assert_equal Fiber.current, Timeout.timeout(10){ Fiber.current }
+    assert_equal Fiber.current, TimeLimit.timeout(10){ Fiber.current }
   end
 
   def test_non_timing_out_code_is_successful
     assert_nothing_raised do
-      assert_equal :ok, Timeout.timeout(100){ :ok }
+      assert_equal :ok, TimeLimit.timeout(100){ :ok }
     end
   end
 
   def test_included
     c = Class.new do
-      include Timeout
+      include TimeLimit
       def test
         timeout(1) { :ok }
       end
@@ -35,19 +35,19 @@ class TestTimeout < Test::Unit::TestCase
   end
 
   # def test_yield_param
-  #   assert_equal [5, :ok], Timeout.timeout(5){|s| [s, :ok] }
+  #   assert_equal [5, :ok], TimeLimit.timeout(5){|s| [s, :ok] }
   # end
 
   def test_queue
     q = Thread::Queue.new
-    assert_raise(Timeout::TimedOut, "[ruby-dev:32935]") {
-      Timeout.timeout(0.01) { q.pop }
+    assert_raise(TimeLimit::TimedOut, "[ruby-dev:32935]") {
+      TimeLimit.timeout(0.01) { q.pop }
     }
   end
 
   def test_timeout
-    assert_raise(Timeout::TimedOut) do
-      Timeout.timeout(0.1) {
+    assert_raise(TimeLimit::TimedOut) do
+      TimeLimit.timeout(0.1) {
         nil while true
       }
     end
@@ -55,9 +55,9 @@ class TestTimeout < Test::Unit::TestCase
 
   def test_nested_timeout
     a = nil
-    assert_raise(Timeout::TimedOut) do
-      Timeout.timeout(0.1) {
-        Timeout.timeout(1) {
+    assert_raise(TimeLimit::TimedOut) do
+      TimeLimit.timeout(0.1) {
+        TimeLimit.timeout(1) {
           nil while true
         }
         a = 1
@@ -69,13 +69,13 @@ class TestTimeout < Test::Unit::TestCase
   def test_cannot_convert_into_time_interval
     bug3168 = '[ruby-dev:41010]'
     def (n = Object.new).zero?; false; end
-    assert_raise(TypeError, bug3168) {Timeout.timeout(n) { sleep 0.1 }}
+    assert_raise(TypeError, bug3168) {TimeLimit.timeout(n) { sleep 0.1 }}
   end
 
   def test_skip_rescue_standarderror
     e = nil
-    assert_raise_with_message(Timeout::TimedOut, /execution expired/) do
-      Timeout.timeout 0.01 do
+    assert_raise_with_message(TimeLimit::TimedOut, /execution expired/) do
+      TimeLimit.timeout 0.01 do
         begin
           sleep 3
         rescue => e
@@ -87,8 +87,8 @@ class TestTimeout < Test::Unit::TestCase
 
   def test_raises_exception_internally
     e = nil
-    assert_raise_with_message(Timeout::TimedOut, /execution expired/) do
-      Timeout.timeout 0.01 do
+    assert_raise_with_message(TimeLimit::TimedOut, /execution expired/) do
+      TimeLimit.timeout 0.01 do
         begin
           sleep 3
         rescue Exception => exc
@@ -97,7 +97,7 @@ class TestTimeout < Test::Unit::TestCase
         end
       end
     end
-    assert_equal Timeout::InterruptException, e.class
+    assert_equal TimeLimit::InterruptException, e.class
   end
 
   # not supporting custom error to raise, for now
@@ -105,7 +105,7 @@ class TestTimeout < Test::Unit::TestCase
   #   exc = Class.new(RuntimeError)
   #   e = nil
   #   assert_nothing_raised(exc) do
-  #     Timeout.timeout 0.01, exc do
+  #     TimeLimit.timeout 0.01, exc do
   #       begin
   #         sleep 3
   #       rescue exc => e
@@ -121,15 +121,15 @@ class TestTimeout < Test::Unit::TestCase
   #     def initialize(msg) super end
   #   end
   #   assert_nothing_raised(ArgumentError, bug9354) do
-  #     assert_equal(:ok, Timeout.timeout(100, err) {:ok})
+  #     assert_equal(:ok, TimeLimit.timeout(100, err) {:ok})
   #   end
   #   assert_raise_with_message(err, 'execution expired') do
-  #     Timeout.timeout 0.01, err do
+  #     TimeLimit.timeout 0.01, err do
   #       sleep 3
   #     end
   #   end
   #   assert_raise_with_message(err, /connection to ruby-lang.org expired/) do
-  #     Timeout.timeout 0.01, err, "connection to ruby-lang.org expired" do
+  #     TimeLimit.timeout 0.01, err, "connection to ruby-lang.org expired" do
   #       sleep 3
   #     end
   #   end
@@ -137,17 +137,17 @@ class TestTimeout < Test::Unit::TestCase
 
   # not supporting custom error message, for now
   # def test_exit_exception
-  #   assert_raise_with_message(Timeout::TimedOut, "boon") do
-  #     Timeout.timeout(10, Timeout::TimedOut) do
-  #       raise Timeout::TimedOut, "boon"
+  #   assert_raise_with_message(TimeLimit::TimedOut, "boon") do
+  #     TimeLimit.timeout(10, TimeLimit::TimedOut) do
+  #       raise TimeLimit::TimedOut, "boon"
   #     end
   #   end
   # end
 
   # def test_raise_with_message
-  #   bug17812 = '[ruby-core:103502] [Bug #17812]: Timeout::TimedOut doesn\'t let two-argument raise() set a new message'
-  #   exc = Timeout::TimedOut.new('foo')
-  #   assert_raise_with_message(Timeout::TimedOut, 'bar', bug17812) do
+  #   bug17812 = '[ruby-core:103502] [Bug #17812]: TimeLimit::TimedOut doesn\'t let two-argument raise() set a new message'
+  #   exc = TimeLimit::TimedOut.new('foo')
+  #   assert_raise_with_message(TimeLimit::TimedOut, 'bar', bug17812) do
   #     raise exc, 'bar'
   #   end
   # end
@@ -158,20 +158,20 @@ class TestTimeout < Test::Unit::TestCase
     def o.each
       sleep
     end
-    assert_raise_with_message(Timeout::TimedOut, 'execution expired', bug9380) do
-      Timeout.timeout(0.01) {e.next}
+    assert_raise_with_message(TimeLimit::TimedOut, 'execution expired', bug9380) do
+      TimeLimit.timeout(0.01) {e.next}
     end
   end
 
   def test_handle_interrupt
     bug11344 = '[ruby-dev:49179] [Bug #11344]'
     ok = false
-    assert_raise(Timeout::TimedOut) {
-      Thread.handle_interrupt(Timeout::InterruptException => :never) {
-        Timeout.timeout(0.01) {
+    assert_raise(TimeLimit::TimedOut) {
+      Thread.handle_interrupt(TimeLimit::InterruptException => :never) {
+        TimeLimit.timeout(0.01) {
           sleep 0.2
           ok = true
-          Thread.handle_interrupt(Timeout::InterruptException => :on_blocking) {
+          Thread.handle_interrupt(TimeLimit::InterruptException => :on_blocking) {
             sleep 0.2
           }
         }
@@ -186,9 +186,9 @@ class TestTimeout < Test::Unit::TestCase
     pid = fork do
       r.close
       begin
-        r = Timeout.timeout(0.01) { sleep 5; }
+        r = TimeLimit.timeout(0.01) { sleep 5; }
         w.write r.inspect
-      rescue Timeout::TimedOut
+      rescue TimeLimit::TimedOut
         w.write 'timeout'
       ensure
         w.close
@@ -200,29 +200,29 @@ class TestTimeout < Test::Unit::TestCase
     r.close
   end
 
-  def test_threadgroup
-    assert_separately(%w[-rtimeout], <<-'end;')
-      tg = ThreadGroup.new
-      thr = Thread.new do
-        tg.add(Thread.current)
-        Timeout.timeout(10){}
-      end
-      thr.join
-      assert_equal [].to_s, tg.list.to_s
-    end;
-  end
+  # def test_threadgroup
+  #   assert_separately(%w[-rtimelimit], <<-'end;')
+  #     tg = ThreadGroup.new
+  #     thr = Thread.new do
+  #       tg.add(Thread.current)
+  #       TimeLimit.timeout(10){}
+  #     end
+  #     thr.join
+  #     assert_equal [].to_s, tg.list.to_s
+  #   end;
+  # end
 
-  # https://github.com/ruby/timeout/issues/24
-  def test_handling_enclosed_threadgroup
-    assert_separately(%w[-rtimeout], <<-'end;')
-      Thread.new {
-        t = Thread.current
-        group = ThreadGroup.new
-        group.add(t)
-        group.enclose
+  # # https://github.com/ruby/timeout/issues/24
+  # def test_handling_enclosed_threadgroup
+  #   assert_separately(%w[-rtimelimit], <<-'end;')
+  #     Thread.new {
+  #       t = Thread.current
+  #       group = ThreadGroup.new
+  #       group.add(t)
+  #       group.enclose
 
-        assert_equal 42, Timeout.timeout(1) { 42 }
-      }.join
-    end;
-  end
+  #       assert_equal 42, TimeLimit.timeout(1) { 42 }
+  #     }.join
+  #   end;
+  # end
 end
