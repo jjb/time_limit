@@ -108,10 +108,10 @@ class TestTimeLimit < Test::Unit::TestCase
     assert_raise(exc) do # inverse of timeout gem 0.4.0
       TimeLimit.timeout 0.01, exc do
         begin
-
           # InterruptException happens here and is not caught by
           # rescue exc below. I'm actually not sure why this is not the case
-          # in timeout gem 0.4.0
+          # in timeout gem 0.4.0, which does not change the interrupt
+          # exception it uses, and the below code does not rescue Exception.
           sleep 3
         rescue exc => e
           rescue_body = true
@@ -145,7 +145,6 @@ class TestTimeLimit < Test::Unit::TestCase
     end
   end
 
-  # not supporting custom error message, for now
   def test_exit_exception
     assert_raise_with_message(TimeLimit::TimedOut, "boon") do
       TimeLimit.timeout(10, TimeLimit::TimedOut) do
