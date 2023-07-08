@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    pairing_heap (3.0.1)
+    concurrent-ruby (1.2.2)
     power_assert (2.0.3)
     rake (13.0.6)
     test-unit (3.6.1)
@@ -13,7 +13,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler
-  pairing_heap
+  concurrent-ruby
   rake
   test-unit
   test-unit-ruby-core
