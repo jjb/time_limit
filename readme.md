@@ -32,14 +32,3 @@ concurrent-ruby is well-maintained and tested, and its libraries
 have known, defined semantics. This makes the implementation easier to reason about,
 instead of working with an custom loop and queue sytem. (Such a system is a reasonable choice
 for a stdlib gem that doesn't want to use third-party dependencies)
-
-## Coming soon: an experimental tool for avoiding ensure blocks being interrupted
-
-```ruby
-...
-ensure
-  TimeLimit::EnsureProtector.mutext do
-    ...
-  end
-end
-```
