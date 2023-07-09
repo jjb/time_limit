@@ -13,9 +13,8 @@ module TimeLimit
     def initialize(proc, thread, custom_exception_class, message)
       @proc = proc
       @thread = thread
-      @custom_exception_class = custom_exception_class || Dummy
+      @custom_exception_class = custom_exception_class
       @interrupt_exception_class = custom_exception_class || InterruptException
-      # @timeout_exception_class = custom_exception_class || TimedOut 
       @message = message || 'execution expired'
       @done = false
       @mutex = Mutex.new
@@ -23,19 +22,14 @@ module TimeLimit
 
     def run
       r = @proc.call
-    rescue @custom_exception_class
-      raise
     rescue InterruptException
       raise TimedOut.new(@message)
-    rescue Exception
-      raise
     else
       if @timeout_expected
-        case @custom_exception_class
-        when Dummy
-          raise TimedOut.new(@message)
+        if @custom_exception_class
+          raise @custom_exception_class.new(@message)
         else
-          raise @interrupt_exception_class.new(@message)
+          raise TimedOut.new(@message)
         end 
       else
         r
