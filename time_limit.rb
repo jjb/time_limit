@@ -15,7 +15,7 @@ module TimeLimit
       @message = message || 'execution expired'
       @done = false
       @mutex = Mutex.new
-      Concurrent::ScheduledTask.new(seconds){ self.interrupt }.execute
+      @watcher = Concurrent::ScheduledTask.new(seconds){ self.interrupt }.execute
     end
 
     def run
@@ -35,6 +35,7 @@ module TimeLimit
     ensure
       @mutex.synchronize do
         @done = true
+        @watcher.cancel
       end
     end
 
