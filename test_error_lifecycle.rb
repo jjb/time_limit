@@ -47,7 +47,7 @@ class TestErrorLifecycle < Test::Unit::TestCase
     s.subject(MyStandardError, StandardError)
     core_assertions(s)
 
-    assert !s.inner_rescue # true in timeout gem 0.4.0, false in time_limit - question: is it a desired feauture of timeout gem that the custom provided exception is seen by the inner code?
+    assert s.inner_rescue
     assert s.outer_rescue # false in timeout gem 0.4.0, true in time_limit
   end
 
