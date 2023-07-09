@@ -5,13 +5,17 @@ require 'concurrent/scheduled_task'
 module TimeLimit
   class InterruptException < Exception; end
   class TimedOut < StandardError; end
-  class TimedOutAndRescued < TimedOut; end
+  # class TimedOutAndRescued < TimedOut; end
+
+  class Dummy; end
 
   class Job
-    def initialize(proc, thread, exception_class, message)
+    def initialize(proc, thread, custom_exception_class, message)
       @proc = proc
       @thread = thread
-      @exception_class = exception_class || TimedOut
+      @custom_exception_class = custom_exception_class || Dummy
+      @interrupt_exception_class = custom_exception_class || InterruptException
+      # @timeout_exception_class = custom_exception_class || TimedOut 
       @message = message || 'execution expired'
       @done = false
       @mutex = Mutex.new
@@ -19,16 +23,20 @@ module TimeLimit
 
     def run
       r = @proc.call
+    rescue @custom_exception_class
+      raise
     rescue InterruptException
-      raise @exception_class.new(@message)
+      raise TimedOut.new(@message)
     rescue Exception
       raise
     else
       if @timeout_expected
-        @mutex.synchronize do
-          @done = true # ensure will not be reached if raising in an else
-        end
-        raise TimedOutAndRescued
+        case @custom_exception_class
+        when Dummy
+          raise TimedOut.new(@message)
+        else
+          raise @interrupt_exception_class.new(@message)
+        end 
       else
         r
       end
@@ -42,7 +50,7 @@ module TimeLimit
       @mutex.synchronize do
         return if @done
         @timeout_expected = true
-        @thread.raise(InterruptException)
+        @thread.raise(@interrupt_exception_class, @message) # test if removing message makes a test fail
       end
     end
   end
