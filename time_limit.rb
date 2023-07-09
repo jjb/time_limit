@@ -7,7 +7,7 @@ module TimeLimit
   class TimedOut < StandardError; end
 
   class Job
-    def initialize(proc, thread, custom_exception_class, message)
+    def initialize(proc, seconds, thread, custom_exception_class, message)
       @proc = proc
       @thread = thread
       @custom_exception_class = custom_exception_class
@@ -15,6 +15,7 @@ module TimeLimit
       @message = message || 'execution expired'
       @done = false
       @mutex = Mutex.new
+      Concurrent::ScheduledTask.new(seconds){ self.interrupt }.execute
     end
 
     def run
@@ -53,8 +54,7 @@ module TimeLimit
     p = Proc.new do
       yield seconds
     end
-    j = Job.new(p, Thread.current, exception_class, message)
-    Concurrent::ScheduledTask.new(seconds){ j.interrupt }.execute
+    j = Job.new(p, seconds, Thread.current, exception_class, message)
     j.run
   end
   module_function :timeout
