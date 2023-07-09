@@ -52,7 +52,7 @@ module TimeLimit
     raise ArgumentError.new('seconds must be greater than zero') if Float(seconds) < 0.0
 
     p = Proc.new do
-      yield
+      yield seconds
     end
     j = Job.new(p, Thread.current, exception_class, message)
     Concurrent::ScheduledTask.new(seconds){ j.interrupt }.execute

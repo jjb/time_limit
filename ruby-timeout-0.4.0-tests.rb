@@ -34,9 +34,9 @@ class TestTimeLimit < Test::Unit::TestCase
     end
   end
 
-  # def test_yield_param
-  #   assert_equal [5, :ok], TimeLimit.timeout(5){|s| [s, :ok] }
-  # end
+  def test_yield_param
+    assert_equal [5, :ok], TimeLimit.timeout(5){|s| [s, :ok] }
+  end
 
   def test_queue
     q = Thread::Queue.new
