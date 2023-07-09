@@ -13,6 +13,6 @@ end
 
 Benchmark.ips do |x|
   x.report("TimeLimit") do
-    value = Timeout.timeout(1) {:ok}
+    value = TimeLimit.timeout(1) {:ok}
   end
 end
