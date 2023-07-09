@@ -60,10 +60,3 @@ module TimeLimit
   end
   module_function :timeout
 end
-
-# idea: give an inner ensure the ability to tell the class it's in an ensure
-# TimeLimit::EnsureProtector.mutext do
-#   ...
-# end
-#
-# https://ruby-doc.org/core-2.5.0/Thread.html#method-c-handle_interrupt
