@@ -2,6 +2,8 @@
 
 require 'concurrent/scheduled_task'
 
+# idea: job template subclass, so some things can be hardcoded. any benefit?
+
 module TimeLimit
   class InterruptException < Exception; end
   class TimedOut < StandardError; end
@@ -44,7 +46,7 @@ module TimeLimit
       @mutex.synchronize do
         return if @done
         @timeout_expected = true
-        @thread.raise(@interrupt_exception_class, @message) # test if removing message makes a test fail
+        @thread.raise(@interrupt_exception_class, @message)
       end
     end
   end
