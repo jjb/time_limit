@@ -47,8 +47,8 @@ module TimeLimit
   end
 
   def timeout(seconds, exception_class=nil, message=nil)
-    # this works but maybe by accident because Float() raises the error
-    raise ArgumentError.new('seconds must be greater than zero') if Float(seconds) < 0.0
+    return yield(seconds) if seconds == nil or seconds.zero? # currently untested https://github.com/ruby/timeout/pull/40
+    seconds = Float(seconds)
 
     p = Proc.new do
       yield seconds
