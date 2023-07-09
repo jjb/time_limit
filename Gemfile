@@ -10,5 +10,6 @@ group :development do
   gem "test-unit"
   gem "test-unit-ruby-core"
   gem "benchmark-ips"
+  gem "benchmark-memory"
   gem "pry"
 end

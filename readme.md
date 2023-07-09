@@ -16,5 +16,6 @@ TimeLimit will always raise an exception when timing out, even if the timed
 code rescues Exception. See instances of `assert s.outer_rescue # false in timeout`
 in the lifecycle test suite for when this is not the case in Timeout.
 
-In a simple benchmark, TimeLimit has about 2x the time complexity of Timeout.
-I haven't tried measuring space complexity.
+In a simple benchmark, TimeLimit has about 2x the time complexity
+and 2.5x the space complexity of Timeout.
+

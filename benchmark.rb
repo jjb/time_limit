@@ -1,6 +1,7 @@
 # bundle exec ruby benchmark.rb
 
 require 'benchmark/ips'
+require "benchmark/memory"
 
 require_relative 'time_limit.rb'
 require 'timeout'
@@ -23,6 +24,20 @@ Benchmark.ips do |x|
 
   x.report("Timeout") do
     the_code(Timeout)
+  end
+
+  x.compare!
+end
+
+GC.start
+
+Benchmark.memory do |x|
+  x.report("TimeLimit") do
+    1_00.times{ the_code(TimeLimit) }
+  end
+
+  x.report("Timeout") do
+    1_00.times{ the_code(Timeout) }
   end
 
   x.compare!
