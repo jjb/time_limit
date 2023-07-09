@@ -15,9 +15,7 @@ Benchmark.ips do |x|
     end
     threads.each(&:join)
   end
-end
 
-Benchmark.ips do |x|
   x.report("Timeout") do
     threads = []
     100.times do
@@ -27,4 +25,6 @@ Benchmark.ips do |x|
     end
     threads.each(&:join)
   end
+
+  x.compare!
 end
