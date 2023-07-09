@@ -209,8 +209,20 @@ class TestTimeLimit < Test::Unit::TestCase
     r.close
   end
 
+  # These tests pass with this hacky diff. Not sure if this issue is relevant to TimeLimit
+  # or not, and not sure if this test really "solves" it or just sneakily passes the test
+  # diff --git a/time_limit.rb b/time_limit.rb
+  # index 0666f16..6ef63b7 100644
+  # --- a/time_limit.rb
+  # +++ b/time_limit.rb
+  # @@ -56,6 +56,8 @@ module TimeLimit
+  #      end
+  #      j = Job.new(p, Thread.current, exception_class, message)
+  #      Concurrent::ScheduledTask.new(seconds){ j.interrupt }.execute
+  # +    t = Thread.list.find{|t| t.inspect =~ /ruby_thread_pool_executor.rb/}
+  # +    ThreadGroup::Default.add(t) unless t.group.enclosed?
   # def test_threadgroup
-  #   assert_separately(%w[-rtimelimit], <<-'end;')
+  #   assert_separately(%w[-rtime_limit -I.], <<-'end;')
   #     tg = ThreadGroup.new
   #     thr = Thread.new do
   #       tg.add(Thread.current)
@@ -223,7 +235,7 @@ class TestTimeLimit < Test::Unit::TestCase
 
   # # https://github.com/ruby/timeout/issues/24
   # def test_handling_enclosed_threadgroup
-  #   assert_separately(%w[-rtimelimit], <<-'end;')
+  #   assert_separately(%w[-rtime_limit -I.], <<-'end;')
   #     Thread.new {
   #       t = Thread.current
   #       group = ThreadGroup.new
