@@ -2,8 +2,6 @@
 
 require 'concurrent/scheduled_task'
 
-# idea: job template subclass, so some things can be hardcoded. any benefit?
-
 module TimeLimit
   class InterruptException < Exception; end
   class TimedOut < StandardError; end
