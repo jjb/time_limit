@@ -7,9 +7,6 @@ require 'concurrent/scheduled_task'
 module TimeLimit
   class InterruptException < Exception; end
   class TimedOut < StandardError; end
-  # class TimedOutAndRescued < TimedOut; end
-
-  class Dummy; end
 
   class Job
     def initialize(proc, thread, custom_exception_class, message)
