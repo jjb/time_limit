@@ -23,15 +23,17 @@ module TimeLimit
     rescue InterruptException
       raise TimedOut.new(@message)
     else
-      if @timeout_expected
-        if @custom_exception_class
-          raise @custom_exception_class.new(@message)
-        else
-          raise TimedOut.new(@message)
-        end 
-      else
-        r
+      @mutex.synchronize do
+        unless @timeout_expected
+          return r
+        end
       end
+
+      if @custom_exception_class
+        raise @custom_exception_class.new(@message)
+      else
+        raise TimedOut.new(@message)
+      end 
     ensure
       @mutex.synchronize do
         @done = true
