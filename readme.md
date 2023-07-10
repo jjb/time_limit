@@ -9,7 +9,7 @@ TimeLimit is implimented with
 concurrent-ruby is well-maintained and tested, and its libraries
 have known, defined semantics. This makes the implementation easier to reason about,
 instead of working with an custom loop and queue sytem. (Such a system is a reasonable choice
-for a stdlib gem that doesn't want to use third-party dependencies)
+for Timeout as it is a stdlib gem that doesn't want to use third-party dependencies)
 
 TimeLimit shares most behaviors with Timeout, with the following exception:
 TimeLimit will always raise an exception when timing out, even if the timed
