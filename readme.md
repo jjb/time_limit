@@ -11,7 +11,7 @@ have known, defined semantics. This makes the implementation easier to reason ab
 instead of working with an custom loop and queue sytem. (Such a system is a reasonable choice
 for Timeout as it is a stdlib gem that doesn't want to use third-party dependencies)
 
-TimeLimit shares most behaviors with Timeout, with the following exception:
+TimeLimit shares most behaviors with Timeout (the entire test suite passes), with the following exception:
 TimeLimit will always raise an exception when timing out, even if the timed
 code rescues Exception. See instances of `assert s.outer_rescue # false in timeout`
 in the lifecycle test suite for when this is not the case in Timeout.
