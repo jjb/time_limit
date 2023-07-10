@@ -200,8 +200,8 @@ class TestTimeLimit < Test::Unit::TestCase
     r.close
   end
 
-  # These tests pass with this hacky diff. Not sure if this issue is relevant to TimeLimit
-  # or not, and not sure if this test really "solves" it or just sneakily passes the test
+  # These tests pass with this hacky patch. Not sure if this issue is relevant to TimeLimit
+  # or not, and not sure if this patch really "solves" it or just sneakily passes the test
   # diff --git a/time_limit.rb b/time_limit.rb
   # index 0666f16..6ef63b7 100644
   # --- a/time_limit.rb
